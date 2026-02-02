@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JDP SUPREME - GOLD EDITION</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --jdp-gold: #f59e0b;
+            --jdp-gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+            --jdp-bg: #020305;
+            --jdp-glass: rgba(20, 22, 28, 0.95);
+            --carbon: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+        }
+
+        body {
+            background: var(--jdp-bg);
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 90px 15px 120px 15px;
+            overflow-x: hidden;
+        }
+
+        /* HEADER INDUSTRIAL */
+        .header-supreme {
+            position: fixed; top: 0; left: 0; right: 0; height: 75px;
+            background: var(--jdp-glass); backdrop-filter: blur(15px);
+            border-bottom: 2px solid var(--jdp-gold); z-index: 1000;
+            display: flex; justify-content: space-between; align-items: center; padding: 0 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+
+        .stats-val { font-size: 22px; font-weight: 900; text-shadow: 0 0 10px var(--jdp-gold); }
+        .stats-label { font-size: 9px; color: var(--jdp-gold); letter-spacing: 2px; text-transform: uppercase; }
+
+        /* GRID DE PRODUTOS */
+        .grid-vendas { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .card-venda {
+            background: var(--jdp-glass); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 15px; overflow: hidden; position: relative;
+            animation: entrada 0.5s ease-out;
+        }
+        @keyframes entrada { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+
+        .card-venda img { width: 100%; height: 130px; object-fit: cover; opacity: 0.8; }
+        .card-info { padding: 12px; text-align: center; }
+        .card-nome { font-size: 11px; color: #aaa; display: block; margin-bottom: 5px; }
+        .card-preco { font-size: 17px; font-weight: 900; color: #fff; }
+        
+        .badge-qtd {
+            position: absolute; top: 10px; right: 10px; background: var(--jdp-gold);
+            color: #000; padding: 4px 10px; border-radius: 8px; font-weight: 900;
+            box-shadow: 0 0 15px var(--jdp-gold);
+        }
+
+        /* MODAL COMPROVANTE CHIQUE */
+        #modal-supreme {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98);
+            z-index: 2000; padding: 20px; flex-direction: column; align-items: center; justify-content: center;
+        }
+
+        .comprovante-ouro {
+            width: 100%; max-width: 340px; background: #0a0a0a var(--carbon);
+            border: 3px solid var(--jdp-gold); border-radius: 2px; padding: 30px 20px;
+            position: relative; box-shadow: 0 0 40px rgba(245, 158, 11, 0.3);
+        }
+
+        .comp-header { text-align: center; border-bottom: 1px solid var(--jdp-gold); margin-bottom: 20px; padding-bottom: 15px; }
+        .comp-header h2 { 
+            background: var(--jdp-gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin: 0; letter-spacing: 4px; font-size: 24px; font-weight: 900;
+        }
+
+        .item-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; color: #eee; }
+        .total-row { 
+            margin-top: 25px; padding: 15px; border: 1px solid var(--jdp-gold);
+            background: rgba(245, 158, 11, 0.05); display: flex; justify-content: space-between;
+            font-weight: 900; font-size: 22px; color: var(--jdp-gold);
+        }
+
+        /* BOTÃO DE AÇÃO SUPREMA */
+        .btn-finalizar {
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
+            width: 85%; background: var(--jdp-gold-gradient); color: #000;
+            padding: 22px; border-radius: 12px; font-weight: 900; border: none;
+            font-size: 16px; letter-spacing: 1px; z-index: 1100; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .btn-confirmar-envio {
+            width: 100%; max-width: 340px; margin-top: 20px; padding: 20px;
+            background: #25D366; color: #fff; border: none; border-radius: 8px;
+            font-weight: 900; font-size: 16px; cursor: pointer;
+        }
+
+        .btn-cancelar { margin-top: 15px; background: transparent; color: #666; border: none; cursor: pointer; }
+
+        /* ADMIN */
+        #painel-admin { display: none; position: fixed; inset: 0; background: #000; z-index: 5000; padding: 20px; }
+        .btn-config { position: fixed; bottom: 110px; right: 20px; color: #333; font-size: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="header-supreme">
+        <div>
+            <div class="stats-label">ITENS</div>
+            <div class="stats-val" id="mini-qtd">00</div>
+        </div>
+        <div style="text-align: right;">
+            <div class="stats-label">TOTAL DO PEDIDO</div>
+            <div class="stats-val" id="mini-total" style="color: var(--jdp-gold);">R$ 0,00</div>
+        </div>
+    </div>
+
+    <div class="grid-vendas" id="vitrine"></div>
+
+    <button class="btn-finalizar" onclick="gerarComprovanteOuro()">
+        <i class="fas fa-check-double"></i> FINALIZAR PEDIDO
+    </button>
+
+    <div class="btn-config" onclick="abrirAdmin()"><i class="fas fa-cog"></i></div>
+
+    <div id="modal-supreme">
+        <div class="comprovante-ouro" id="print-area">
+            <div class="comp-header">
+                <h2>DONY BURGUERS</h2>
+                <div style="font-size: 9px; color: var(--jdp-gold); margin-top: 5px; letter-spacing: 2px;">INDUSTRIAL SUPREME</div>
+            </div>
+            <div id="comp-itens"></div>
+            <div class="total-row">
+                <span>TOTAL</span>
+                <span id="comp-total"></span>
+            </div>
+            <div style="text-align: center; font-size: 8px; color: #444; margin-top: 25px; letter-spacing: 3px;">
+                AUTENTICADO POR JDP INDUSTRIAL
+            </div>
+        </div>
+
+        <button class="btn-confirmar-envio" onclick="executarAcaoDual()">
+            <i class="fab fa-whatsapp"></i> CONFIRMAR E ENVIAR COZINHA
+        </button>
+        <button class="btn-cancelar" onclick="fecharModal()">VOLTAR AO MENU</button>
+    </div>
+
+    <div id="painel-admin">
+        <h2 style="color:var(--jdp-gold)">KERNEL ADMIN</h2>
+        <input type="text" id="adm-nome" placeholder="NOME" style="width:100%; padding:15px; margin-bottom:10px; background:#111; border:1px solid #333; color:#fff;">
+        <input type="number" id="adm-preco" placeholder="PREÇO" style="width:100%; padding:15px; margin-bottom:10px; background:#111; border:1px solid #333; color:#fff;">
+        <input type="text" id="adm-link" placeholder="LINK FOTO" style="width:100%; padding:15px; margin-bottom:10px; background:#111; border:1px solid #333; color:#fff;">
+        <button onclick="salvarProduto()" style="width:100%; padding:20px; background:var(--jdp-gold); border:none; font-weight:900;">CADASTRAR</button>
+        <button onclick="fecharAdmin()" style="width:100%; padding:10px; background:transparent; color:#fff; border:none; margin-top:10px;">SAIR</button>
+        <div id="lista-admin" style="margin-top:20px"></div>
+    </div>
+
+    <script>
+        // 1. CONFIGURAÇÃO INDUSTRIAL FIREBASE (A CONEXÃO COM A NUVEM)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCEdXF7ScnMYz0Ce0OW-B_UJ8Bm5Pl9m8o",
+            authDomain: "dony-burguers.firebaseapp.com",
+            databaseURL: "https://dony-burguers-default-rtdb.firebaseio.com",
+            projectId: "dony-burguers",
+            storageBucket: "dony-burguers.firebasestorage.app",
+            messagingSenderId: "511509845142",
+            appId: "1:511509845142:web:9b0254a09ad8051e039eb7"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let carrinho = [];
+        let produtosGlobais = [];
+        const WHATSAPP_NUM = "5592984846058";
+
+        // 2. SINCRONIZAÇÃO EM TEMPO REAL (SEM PERDER SEU LOCALSTORAGE)
+        window.onload = () => {
+            db.ref('cardapio_supreme').on('value', snap => {
+                const data = snap.val();
+                produtosGlobais = data ? Object.values(data) : [];
+                // Se a nuvem estiver vazia, usa o seu localStorage original
+                if(produtosGlobais.length === 0) {
+                    produtosGlobais = JSON.parse(localStorage.getItem('jdp_cardapio')) || [];
+                }
+                renderizar();
+            });
+        };
+
+        function renderizar() {
+            const vitrine = document.getElementById('vitrine');
+            let total = 0, itens = 0;
+
+            carrinho.forEach(c => { total += (c.preco * c.qtd); itens += c.qtd; });
+            document.getElementById('mini-total').innerText = `R$ ${total.toFixed(2)}`;
+            document.getElementById('mini-qtd').innerText = itens.toString().padStart(2, '0');
+
+            vitrine.innerHTML = produtosGlobais.map((p, i) => {
+                const item = carrinho.find(c => c.nome === p.nome);
+                const qtd = item ? item.qtd : 0;
+                return `
+                    <div class="card-venda" onclick="addCarrinho(${i})">
+                        ${qtd > 0 ? `<div class="badge-qtd">${qtd}</div>` : ''}
+                        <img src="${p.link}">
+                        <div class="card-info">
+                            <span class="card-nome">${p.nome}</span>
+                            <span class="card-preco">R$ ${parseFloat(p.preco).toFixed(2)}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function addCarrinho(i) {
+            const p = produtosGlobais[i];
+            const item = carrinho.find(c => c.nome === p.nome);
+            if (item) item.qtd++; else carrinho.push({ ...p, qtd: 1 });
+            renderizar();
+        }
+
+        function gerarComprovanteOuro() {
+            if (carrinho.length === 0) return alert("CARRINHO VAZIO");
+            const lista = document.getElementById('comp-itens');
+            let total = 0;
+            lista.innerHTML = carrinho.map(i => {
+                total += (i.qtd * i.preco);
+                return `<div class="item-row"><span>${i.qtd}x ${i.nome}</span><span>R$ ${(i.qtd*i.preco).toFixed(2)}</span></div>`;
+            }).join('');
+            document.getElementById('comp-total').innerText = `R$ ${total.toFixed(2)}`;
+            document.getElementById('modal-supreme').style.display = 'flex';
+        }
+
+        function executarAcaoDual() {
+            const alvo = document.getElementById('print-area');
+            html2canvas(alvo, { backgroundColor: "#000", scale: 2 }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `COMPROVANTE-JDP-${Date.now()}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+
+                let msg = `*🔥 NOVA ORDEM DE PRODUÇÃO*\n`;
+                msg += `--------------------------------\n`;
+                carrinho.forEach(i => { msg += `✅ *${i.qtd}x* ${i.nome}\n`; });
+                msg += `--------------------------------\n`;
+                msg += `*TOTAL: R$ ${document.getElementById('comp-total').innerText}*\n`;
+                msg += `_Comprovante gerado e salvo._`;
+                
+                window.open(`https://wa.me/${WHATSAPP_NUM}?text=${encodeURIComponent(msg)}`);
+                
+                // Limpa carrinho após sucesso
+                carrinho = [];
+                renderizar();
+                fecharModal();
+            });
+        }
+
+        function fecharModal() { document.getElementById('modal-supreme').style.display = 'none'; }
+
+        // ADMIN CONECTADO AO FIREBASE
+        function abrirAdmin() { if(prompt("SENHA:") === "drkling2025") document.getElementById('painel-admin').style.display = 'block'; listarAdmin(); }
+        function fecharAdmin() { document.getElementById('painel-admin').style.display = 'none'; }
+        
+        function salvarProduto() {
+            const nome = document.getElementById('adm-nome').value.toUpperCase();
+            const preco = parseFloat(document.getElementById('adm-preco').value);
+            const link = document.getElementById('adm-link').value;
+            
+            if(nome && preco && link) {
+                // Salva na Nuvem (Firebase)
+                const ref = db.ref('cardapio_supreme').push();
+                ref.set({ id: ref.key, nome, preco, link });
+                
+                // Mantém cópia local como backup
+                let produtos = JSON.parse(localStorage.getItem('jdp_cardapio')) || [];
+                produtos.push({ nome, preco, link });
+                localStorage.setItem('jdp_cardapio', JSON.stringify(produtos));
+                
+                alert("PRODUTO LANÇADO NA REDE!");
+                document.getElementById('adm-nome').value = '';
+                document.getElementById('adm-preco').value = '';
+                document.getElementById('adm-link').value = '';
+            }
+        }
+
+        function listarAdmin() {
+            document.getElementById('lista-admin').innerHTML = produtosGlobais.map((p, i) => `
+                <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #222;">
+                    <span>${p.nome}</span>
+                    <button onclick="remover('${p.id || i}')" style="background:red; color:white; border:none; padding: 5px 10px;">X</button>
+                </div>
+            `).join('');
+        }
+
+        function remover(id) {
+            // Remove da Nuvem
+            db.ref('cardapio_supreme').child(id).remove();
+            alert("REMOVIDO DA REDE!");
+        }
+    </script>
+</body>
+</html>

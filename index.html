@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HELENA v13.5 | SUPREME INDUSTRIAL</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --gold-bright: #FFD700;
+            --bg-black: #050505;
+            --industrial-border: 2px solid var(--gold);
+            --white-elite: #FFFFFF;
+        }
+
+        * { box-sizing: border-box; font-family: 'Orbitron', sans-serif; -webkit-tap-highlight-color: transparent; }
+        
+        body, html { 
+            background: #000; margin: 0; padding: 0; width: 100%; height: 100%; 
+            overflow: hidden; display: flex; justify-content: center; align-items: center;
+        }
+
+        .app-container {
+            width: 100%; max-width: 500px; height: 100dvh;
+            background: var(--bg-black); border: 2px solid var(--gold);
+            position: relative; display: flex; flex-direction: column; padding: 20px;
+        }
+
+        .credit-status {
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold);
+            padding: 10px 15px; border-radius: 5px; margin-bottom: 10px;
+        }
+        .credit-label { font-size: 9px; color: #888; letter-spacing: 1px; }
+        .credit-value { color: var(--gold-bright); font-weight: bold; font-size: 18px; }
+
+        .header { text-align: center; margin-bottom: 15px; border-bottom: 1px solid rgba(212, 175, 55, 0.3); padding-bottom: 10px; }
+        .header h1 { font-size: 18px; letter-spacing: 4px; margin: 0; color: var(--gold); }
+
+        .display-engine {
+            width: 100%; height: 42%;
+            border: var(--industrial-border); border-radius: 15px;
+            position: relative; overflow: hidden; background: #111;
+            animation: industrialVibrate 5s infinite;
+        }
+
+        .display-engine::after {
+            content: ''; position: absolute; top: 0; left: -150%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.6), transparent);
+            transform: skewX(-25deg); animation: goldSweep 5s infinite; z-index: 20; pointer-events: none;
+        }
+
+        @keyframes goldSweep { 0% { left: -150%; } 15% { left: 150%; } 100% { left: 150%; } }
+        @keyframes industrialVibrate { 0%, 10% { transform: scale(1); } 12% { transform: scale(1.02) rotate(0.5deg); } 14% { transform: scale(1) rotate(-0.5deg); } 16% { transform: scale(1.02) rotate(0deg); } 18%, 100% { transform: scale(1); } }
+
+        .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 0.8s ease-in-out; display: flex; flex-direction: column; }
+        .slide.active { opacity: 1; z-index: 5; }
+        .slide img, .slide video { width: 100%; height: 100%; object-fit: cover; }
+
+        .slide-info {
+            position: absolute; bottom: 0; width: 100%;
+            background: linear-gradient(transparent, rgba(0,0,0,0.95));
+            padding: 15px; text-align: center; z-index: 25;
+        }
+
+        .identity-row {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: auto; padding: 15px 0; border-top: 1px solid rgba(212, 175, 55, 0.3); gap: 10px;
+        }
+
+        #qrcode { background: var(--gold); padding: 5px; border-radius: 4px; }
+        .barcode-box { flex-grow: 1; display: flex; flex-direction: column; align-items: center; background: #fff; padding: 5px; border-radius: 4px; }
+        #barcode { width: 100%; max-height: 50px; }
+
+        /* SEUS BOTÕES ORIGINAIS PRESERVADOS */
+        .wa-float {
+            position: absolute; bottom: 90px; right: 20px; width: 60px; height: 60px;
+            background: linear-gradient(145deg, var(--gold), var(--gold-bright));
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.5); z-index: 100; cursor: pointer;
+        }
+
+        .portal-float {
+            position: absolute; bottom: 160px; right: 20px; width: 60px; height: 60px;
+            background: var(--white-elite); border-radius: 50%; display: flex; 
+            justify-content: center; align-items: center;
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.3); z-index: 100; cursor: pointer;
+            border: 2px solid var(--gold);
+        }
+
+        .btn-elite {
+            background: var(--white-elite); color: #000; border: none;
+            padding: 15px; font-weight: 900; cursor: pointer; width: 100%;
+            border-radius: 5px; text-transform: uppercase; font-size: 12px;
+            box-shadow: 0 0 15px rgba(255,255,255,0.3); margin-top: 10px;
+        }
+
+        #admin-panel {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 1000; display: none; padding: 30px; overflow-y: auto;
+        }
+        input { width: 100%; background: #111; border: 1px solid var(--gold); color: #fff; padding: 12px; border-radius: 5px; margin-bottom: 10px; }
+        .btn-action { width: 100%; background: var(--gold); color: #000; border: none; padding: 15px; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
+        .admin-trigger { position: absolute; top: 20px; right: 20px; width: 30px; height: 30px; border: 1px solid var(--gold); border-radius: 50%; z-index: 150; display: flex; align-items: center; justify-content: center; opacity: 0.4; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <div class="admin-trigger" onclick="toggleAdmin(true)">
+            <svg width="15" viewBox="0 0 24 24" fill="var(--gold)"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        </div>
+
+        <div class="portal-float" id="btnEntrar" onclick="executarDirecionamento()">
+            <svg width="30" viewBox="0 0 24 24" fill="#000"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+        </div>
+
+        <div class="wa-float" onclick="sendWA('Geral')">
+            <svg width="30" viewBox="0 0 24 24" fill="#000"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.72.937 3.659 1.432 5.631 1.433h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+        </div>
+
+        <div class="credit-status">
+            <div>
+                <div class="credit-label">SALDO INDUSTRIAL</div>
+                <div class="credit-value">C$ <span id="balance">0.00</span></div>
+            </div>
+            <div style="text-align: right;">
+                <div class="credit-label">STATUS</div>
+                <div style="color: #00ff00; font-size: 10px;">ONLINE</div>
+            </div>
+        </div>
+
+        <div class="header">
+            <h1>DONY BURGUER</h1>
+            <div style="font-size: 8px; letter-spacing: 2px; color: #888; margin-top: 4px;">SUPREME INTERFACE v13.5</div>
+        </div>
+
+        <div class="display-engine" id="mainDisplay">
+            <div class="slide active">
+                <div style="display:flex; align-items:center; justify-content:center; height:100%; text-align:center; padding:20px; font-size: 10px; color: var(--gold);">
+                    INICIALIZANDO COMANDO...
+                </div>
+            </div>
+        </div>
+
+        <div class="identity-row">
+            <div id="qrcode"></div>
+            <div class="barcode-box">
+                <svg id="barcode"></svg>
+            </div>
+        </div>
+
+        <div id="admin-panel">
+            <h2 style="color:var(--gold); font-size:14px; border-bottom:1px solid var(--gold); padding-bottom:10px;">ESCRITÓRIO JDP - CENTRAL</h2>
+            <input type="number" id="refillValue" placeholder="Valor da Recarga">
+            <button class="btn-action" onclick="refillCredits()">ADICIONAR SALDO</button>
+            <input type="text" id="pName" placeholder="Nome do Produto">
+            <input type="number" id="pPrice" placeholder="Custo">
+            <input type="text" id="pLink" placeholder="Link da Mídia">
+            <button class="btn-action" onclick="addPromo()">PUBLICAR AGORA</button>
+            <button class="btn-action" onclick="toggleAdmin(false)" style="background:none; color:var(--gold); border: 1px solid var(--gold);">FECHAR PAINEL</button>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURAÇÃO DO FAZENDEIRO (FIREBASE) ADICIONADA SEM REMOVER O RESTO
+        const firebaseConfig = {
+            apiKey: "AIzaSyCEdXF7ScnMYz0Ce0OW-B_UJ8Bm5Pl9m8o",
+            authDomain: "dony-burguers.firebaseapp.com",
+            databaseURL: "https://dony-burguers-default-rtdb.firebaseio.com",
+            projectId: "dony-burguers",
+            storageBucket: "dony-burguers.firebasestorage.app",
+            messagingSenderId: "511509845142",
+            appId: "1:511509845142:web:9b0254a09ad8051e039eb7"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        const WHATSAPP_NUM = "5592984846058";
+        const CLIENT_ID = "JDP-92984846058";
+        
+        let credits = 0;
+        let promos = [];
+        let currentIndex = 0;
+
+        // FUNÇÃO DE DIRECIONAMENTO PRESERVADA
+        function executarDirecionamento() {
+            window.location.href = "https://pradodalapa-hue.github.io/CENTRAL_JDP.html/nota.html"; 
+        }
+
+        function toggleAdmin(show) { document.getElementById('admin-panel').style.display = show ? 'block' : 'none'; }
+
+        // SINCRONIZAÇÃO EM TEMPO REAL
+        function initSync() {
+            db.ref('clientes/' + CLIENT_ID).on('value', snap => {
+                credits = snap.val() ? snap.val().saldo : 0;
+                document.getElementById('balance').innerText = credits.toFixed(2);
+            });
+
+            db.ref('promocoes').on('value', snap => {
+                const data = snap.val();
+                promos = data ? Object.entries(data).map(([id, val]) => ({id, ...val})) : [];
+                updateDisplay();
+            });
+        }
+
+        function refillCredits() {
+            const val = parseFloat(document.getElementById('refillValue').value);
+            if(isNaN(val)) return;
+            db.ref('clientes/' + CLIENT_ID + '/saldo').transaction(c => (c || 0) + val);
+            document.getElementById('refillValue').value = '';
+        }
+
+        function addPromo() {
+            const name = document.getElementById('pName').value;
+            const price = parseFloat(document.getElementById('pPrice').value);
+            const link = document.getElementById('pLink').value;
+            if(name && link) db.ref('promocoes').push({ name, price, link });
+        }
+
+        function updateDisplay() {
+            const container = document.getElementById('mainDisplay');
+            if(promos.length === 0) return;
+            container.innerHTML = '';
+            promos.forEach((p, i) => {
+                const slide = document.createElement('div');
+                slide.className = `slide ${i === 0 ? 'active' : ''}`;
+                const media = p.link.includes('.mp4') ? `<video src="${p.link}" autoplay muted loop playsinline></video>` : `<img src="${p.link}">`;
+                slide.innerHTML = `${media}<div class="slide-info"><div style="font-weight:bold; color:#fff; font-size:12px;">${p.name.toUpperCase()}</div><div style="color:var(--gold); font-size:20px; margin-top:5px;">C$ ${p.price.toFixed(2)}</div><button class="btn-elite" onclick="processPurchase('${p.id}', ${p.price}, '${p.name}')">CONFIRMAR PEDIDO</button></div>`;
+                container.appendChild(slide);
+            });
+        }
+
+        function processPurchase(id, price, name) {
+            if(credits >= price) {
+                if(confirm(`DEBITAR C$ ${price.toFixed(2)}?`)) {
+                    db.ref('clientes/' + CLIENT_ID + '/saldo').set(credits - price);
+                    sendWA(name, `C$ ${price.toFixed(2)}`);
+                }
+            } else { alert("SALDO INSUFICIENTE."); }
+        }
+
+        function sendWA(item, price = "") {
+            let msg = item === 'Geral' ? "Solicito atendimento." : `Compra de: *${item}* - Valor: *${price}*. PAGO VIA HELENA.`;
+            window.location.href = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUM}&text=${encodeURIComponent(msg)}`;
+        }
+
+        window.onload = () => {
+            initSync();
+            new QRCode(document.getElementById("qrcode"), { text: CLIENT_ID, width: 60, height: 60, colorDark : "#000", colorLight : "#D4AF37" });
+            JsBarcode("#barcode", CLIENT_ID, { format: "CODE128", lineColor: "#000", width: 2, height: 40, displayValue: true, fontSize: 10 });
+            setInterval(() => {
+                const slides = document.querySelectorAll('.slide');
+                if(slides.length < 2) return;
+                slides[currentIndex].classList.remove('active');
+                currentIndex = (currentIndex + 1) % promos.length;
+                slides[currentIndex].classList.add('active');
+            }, 6000);
+        };
+    </script>
+</body>
+</html>
