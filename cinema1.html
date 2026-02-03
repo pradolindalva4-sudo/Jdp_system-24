@@ -1,0 +1,178 @@
+html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JDP SUPREME KERNEL v13.5 - INDUSTRIAL CONTROL</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --blue: #00f2ff; --yellow: #f59e0b; --green: #00ff88; 
+            --black: #000000; --gold: #d4af37; --font-hud: 'Orbitron', sans-serif;
+        }
+
+        body, html {
+            margin: 0; padding: 0; background: var(--black);
+            color: white; font-family: 'Rajdhani', sans-serif;
+            height: 100vh; overflow: hidden;
+        }
+
+        /* VIEWPORT DE MÍDIA */
+        #tv-master-viewport { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            z-index: 1; background: #000; overflow: hidden;
+        }
+        
+        .tv-content-full { 
+            width: 166.66%; height: 166.66%; border: none; 
+            position: absolute; transform: scale(0.6); transform-origin: top left;
+        }
+
+        /* HUD SUPERIOR */
+        .top-command-bar {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100px;
+            z-index: 5000; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 50px; background: linear-gradient(to bottom, rgba(0,0,0,0.95), transparent);
+            backdrop-filter: blur(10px); border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .system-status {
+            display: flex; flex-direction: column;
+            border-left: 4px solid var(--gold); padding-left: 20px;
+        }
+        .system-status small { font-family: var(--font-hud); font-size: 10px; letter-spacing: 3px; color: var(--gold); }
+        .system-status strong { font-family: var(--font-hud); font-size: 24px; color: #fff; text-shadow: 0 0 15px var(--gold); }
+
+        .search-zone { flex-grow: 1; display: flex; justify-content: center; max-width: 500px; }
+        .search-input-wrapper {
+            width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 5px; padding: 10px 25px; display: flex; align-items: center;
+        }
+        .search-input-wrapper input {
+            background: transparent; border: none; color: white; font-size: 18px;
+            width: 100%; outline: none; font-family: 'Rajdhani'; letter-spacing: 1px;
+        }
+
+        /* BOTÃO ÚNICO - COMBO MINIATURA */
+        .side-nav { position: fixed; bottom: 40px; right: 40px; z-index: 5500; }
+        
+        .btn-combo-supreme {
+            width: 120px; height: 120px; border-radius: 20px;
+            border: 3px solid var(--gold); background: url('https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?q=80&w=500&auto=format&fit=crop') center/cover;
+            cursor: pointer; position: relative;
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
+            animation: slowVibrate 8s infinite ease-in-out;
+            transition: 0.5s;
+        }
+
+        .btn-combo-supreme::after {
+            content: 'CARDAPIO'; position: absolute; bottom: -25px; left: 50%;
+            transform: translateX(-50%); font-family: var(--font-hud);
+            font-size: 10px; color: var(--gold); white-space: nowrap; letter-spacing: 2px;
+        }
+
+        .btn-combo-supreme:hover {
+            transform: scale(1.1); box-shadow: 0 0 50px var(--gold);
+            filter: brightness(1.2);
+        }
+
+        @keyframes slowVibrate {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(2px, 2px) rotate(0.5deg); }
+            50% { transform: translate(-1px, 3px) rotate(-0.5deg); }
+            75% { transform: translate(-2px, -1px) rotate(0.2deg); }
+        }
+
+        /* MODAL ADMIN */
+        .modal-admin {
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: #080808; border: 2px solid var(--gold); padding: 40px; z-index: 7000;
+            width: 420px; border-radius: 20px;
+        }
+        .admin-input { width: 100%; padding: 15px; background: #000; border: 1px solid #222; color: white; margin-bottom: 15px; font-family: var(--font-hud); border-radius: 8px; }
+
+    </style>
+</head>
+<body>
+
+    <!-- GATILHO OCULTO PARA ADMIN -->
+    <div style="position:fixed; top:0; left:0; width:80px; height:80px; z-index:9999;" onclick="abrirAdmin(false)"></div>
+
+    <div class="top-command-bar">
+        <div class="DONY-BURGUER'S">
+            <small>cliente vip</small>
+            <strong>DONY-BURGUER'S</strong>
+        </div>
+
+        <div class="search-zone">
+            <div class="search-input-wrapper">
+                <input type="text" id="tv-input" placeholder="BUSCA ...">
+                <i class="fas fa-search" style="color:var(--gold); cursor:pointer;" onclick="ativarBusca()"></i>
+            </div>
+        </div>
+
+        <div style="text-align: right;">
+            <div style="font-family: var(--font-hud); color: var(--gold); font-size: 12px; letter-spacing: 4px;">HELENA v13.5</div>
+            <div style="font-size: 10px; color: rgba(255,255,255,0.3); letter-spacing: 2px;">INDUSTRIAL INTERFACE</div>
+        </div>
+    </div>
+
+    <div id="tv-master-viewport">
+        <div id="tv-engine" style="width:100%; height:100%;">
+            <div style="width:100%; height:100%; background: radial-gradient(circle, #151515, #000);"></div>
+        </div>
+    </div>
+
+    <!-- BOTÃO ÚNICO COM MINIATURA -->
+    <div class="side-nav">
+        <div class="btn-combo-supreme" onclick="abrirPortal('https://pradolindalva4-sudo.github.io/Jdp_system-24/carrinho.html')"></div>
+    </div>
+
+    <!-- PAINEL DE INJEÇÃO (SOB O CAPÔ) -->
+    <div id="modal-admin" class="modal-admin">
+        <h2 style="color:var(--gold); text-align:center; font-family: var(--font-hud); margin-bottom: 30px;">INJEÇÃO DE MÍDIA</h2>
+        <input type="text" id="remote-url" class="admin-input" placeholder="URL (YOUTUBE / MP4 / PORTAL)">
+        <button onclick="executarMidia()" style="width:100%; padding:18px; background:var(--gold); color:black; border:none; font-weight:bold; cursor:pointer; font-family: var(--font-hud); border-radius: 10px;">INJETAR NO KERNEL</button>
+        <button onclick="fecharAdmin()" style="width:100%; padding:10px; background:transparent; color:gray; border:none; margin-top:25px; cursor:pointer;">FECHAR</button>
+    </div>
+
+    <script>
+        // MOTOR DE BUSCA E MÍDIA
+        function ativarBusca() {
+            const query = document.getElementById('tv-input').value;
+            if(!query) return;
+            document.getElementById('tv-engine').innerHTML = `<iframe class="tv-content-full" src="https://www.bing.com/videos/search?q=${encodeURIComponent(query)}&FORM=VRFLTR" allow="autoplay"></iframe>`;
+        }
+
+        function abrirPortal(url) {
+            document.getElementById('tv-engine').innerHTML = `<iframe class="tv-content-full" src="${url}" allow="autoplay; encrypted-media; fullscreen"></iframe>`;
+        }
+
+        function executarMidia() {
+            const url = document.getElementById('remote-url').value;
+            if(!url) return;
+            const engine = document.getElementById('tv-engine');
+            
+            if(url.includes('youtube.com') || url.includes('youtu.be')) {
+                const id = url.includes('v=') ? url.split('v=')[1].split('&')[0] : url.split('/').pop();
+                engine.innerHTML = `<iframe class="tv-content-full" src="https://www.youtube.com/embed/${id}?autoplay=1&mute=0&controls=0" allow="autoplay"></iframe>`;
+            } else {
+                engine.innerHTML = `<iframe class="tv-content-full" src="${url}" allow="autoplay"></iframe>`;
+            }
+            fecharAdmin();
+        }
+
+        document.getElementById('tv-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') ativarBusca(); });
+
+        // CONTROLE DE ACESSO ADMIN
+        function abrirAdmin() { 
+            if(prompt("AUTENTICAÇÃO JDP:") === "drkling2025") {
+                document.getElementById('modal-admin').style.display = 'block';
+            }
+        }
+        function fecharAdmin() { document.getElementById('modal-admin').style.display = 'none'; }
+    </script>
+</body>
+</html>
