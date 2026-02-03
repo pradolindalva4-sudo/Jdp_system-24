@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -6,10 +7,10 @@
     <title>JDP SUPREME - GOLD EDITION</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script> 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
     <style>
         :root {
             --jdp-gold: #f59e0b;
@@ -60,7 +61,7 @@
             box-shadow: 0 0 15px var(--jdp-gold);
         }
 
-        /* MODAL COMPROVANTE CHIQUE */
+        /* MODAL COMPROVANTE */
         #modal-supreme {
             display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98);
             z-index: 2000; padding: 20px; flex-direction: column; align-items: center; justify-content: center;
@@ -75,7 +76,7 @@
         .comp-header { text-align: center; border-bottom: 1px solid var(--jdp-gold); margin-bottom: 20px; padding-bottom: 15px; }
         .comp-header h2 { 
             background: var(--jdp-gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            margin: 0; letter-spacing: 4px; font-size: 24px; font-weight: 900;
+            margin: 0; letter-spacing: 4px; font-size: 24px; font-weight: 900; cursor: pointer;
         }
 
         .item-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; color: #eee; }
@@ -85,7 +86,6 @@
             font-weight: 900; font-size: 22px; color: var(--jdp-gold);
         }
 
-        /* BOTÃO DE AÇÃO SUPREMA */
         .btn-finalizar {
             position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
             width: 85%; background: var(--jdp-gold-gradient); color: #000;
@@ -101,9 +101,20 @@
 
         .btn-cancelar { margin-top: 15px; background: transparent; color: #666; border: none; cursor: pointer; }
 
-        /* ADMIN */
-        #painel-admin { display: none; position: fixed; inset: 0; background: #000; z-index: 5000; padding: 20px; }
-        .btn-config { position: fixed; bottom: 110px; right: 20px; color: #333; font-size: 20px; }
+        /* TEXTO SAGRADO */
+        .sacred-text {
+            text-align: center;
+            color: var(--jdp-gold);
+            font-size: 7px;
+            margin-top: 15px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 400;
+            opacity: 0.8;
+        }
+
+        /* ADMIN PANEL */
+        #painel-admin { display: none; position: fixed; inset: 0; background: #000; z-index: 5000; padding: 20px; overflow-y: auto; }
     </style>
 </head>
 <body>
@@ -125,12 +136,10 @@
         <i class="fas fa-check-double"></i> FINALIZAR PEDIDO
     </button>
 
-    <div class="btn-config" onclick="abrirAdmin()"><i class="fas fa-cog"></i></div>
-
     <div id="modal-supreme">
         <div class="comprovante-ouro" id="print-area">
             <div class="comp-header">
-                <h2>DONY BURGUERS</h2>
+                <h2 onclick="abrirAdmin()">DONY BURGUERS</h2>
                 <div style="font-size: 9px; color: var(--jdp-gold); margin-top: 5px; letter-spacing: 2px;">INDUSTRIAL SUPREME</div>
             </div>
             <div id="comp-itens"></div>
@@ -138,8 +147,12 @@
                 <span>TOTAL</span>
                 <span id="comp-total"></span>
             </div>
-            <div style="text-align: center; font-size: 8px; color: #444; margin-top: 25px; letter-spacing: 3px;">
+            <div style="text-align: center; font-size: 8px; color: #444; margin-top: 20px; letter-spacing: 3px;">
                 AUTENTICADO POR JDP INDUSTRIAL
+            </div>
+            <!-- TEXTO SOLICITADO PELO SR. JOSÉ -->
+            <div class="sacred-text">
+                O SENHOR É MEU PASTOR E NADA ME FALTARÁ
             </div>
         </div>
 
@@ -160,7 +173,6 @@
     </div>
 
     <script>
-        // 1. CONFIGURAÇÃO INDUSTRIAL FIREBASE (A CONEXÃO COM A NUVEM)
         const firebaseConfig = {
             apiKey: "AIzaSyCEdXF7ScnMYz0Ce0OW-B_UJ8Bm5Pl9m8o",
             authDomain: "dony-burguers.firebaseapp.com",
@@ -178,12 +190,10 @@
         let produtosGlobais = [];
         const WHATSAPP_NUM = "5592984846058";
 
-        // 2. SINCRONIZAÇÃO EM TEMPO REAL (SEM PERDER SEU LOCALSTORAGE)
         window.onload = () => {
             db.ref('cardapio_supreme').on('value', snap => {
                 const data = snap.val();
                 produtosGlobais = data ? Object.values(data) : [];
-                // Se a nuvem estiver vazia, usa o seu localStorage original
                 if(produtosGlobais.length === 0) {
                     produtosGlobais = JSON.parse(localStorage.getItem('jdp_cardapio')) || [];
                 }
@@ -194,7 +204,6 @@
         function renderizar() {
             const vitrine = document.getElementById('vitrine');
             let total = 0, itens = 0;
-
             carrinho.forEach(c => { total += (c.preco * c.qtd); itens += c.qtd; });
             document.getElementById('mini-total').innerText = `R$ ${total.toFixed(2)}`;
             document.getElementById('mini-qtd').innerText = itens.toString().padStart(2, '0');
@@ -247,11 +256,7 @@
                 carrinho.forEach(i => { msg += `✅ *${i.qtd}x* ${i.nome}\n`; });
                 msg += `--------------------------------\n`;
                 msg += `*TOTAL: R$ ${document.getElementById('comp-total').innerText}*\n`;
-                msg += `_Comprovante gerado e salvo._`;
-                
                 window.open(`https://wa.me/${WHATSAPP_NUM}?text=${encodeURIComponent(msg)}`);
-                
-                // Limpa carrinho após sucesso
                 carrinho = [];
                 renderizar();
                 fecharModal();
@@ -260,26 +265,23 @@
 
         function fecharModal() { document.getElementById('modal-supreme').style.display = 'none'; }
 
-        // ADMIN CONECTADO AO FIREBASE
-        function abrirAdmin() { if(prompt("SENHA:") === "drkling2025") document.getElementById('painel-admin').style.display = 'block'; listarAdmin(); }
-        function fecharAdmin() { document.getElementById('painel-admin').style.display = 'none'; }
+        function abrirAdmin() { 
+            if(prompt("SENHA DE AUTORIDADE:") === "drkling2025") {
+                document.getElementById('painel-admin').style.display = 'block'; 
+                listarAdmin(); 
+            }
+        }
         
+        function fecharAdmin() { document.getElementById('painel-admin').style.display = 'none'; }
+
         function salvarProduto() {
             const nome = document.getElementById('adm-nome').value.toUpperCase();
             const preco = parseFloat(document.getElementById('adm-preco').value);
             const link = document.getElementById('adm-link').value;
-            
             if(nome && preco && link) {
-                // Salva na Nuvem (Firebase)
                 const ref = db.ref('cardapio_supreme').push();
                 ref.set({ id: ref.key, nome, preco, link });
-                
-                // Mantém cópia local como backup
-                let produtos = JSON.parse(localStorage.getItem('jdp_cardapio')) || [];
-                produtos.push({ nome, preco, link });
-                localStorage.setItem('jdp_cardapio', JSON.stringify(produtos));
-                
-                alert("PRODUTO LANÇADO NA REDE!");
+                alert("PRODUTO SINCRONIZADO!");
                 document.getElementById('adm-nome').value = '';
                 document.getElementById('adm-preco').value = '';
                 document.getElementById('adm-link').value = '';
@@ -296,9 +298,8 @@
         }
 
         function remover(id) {
-            // Remove da Nuvem
             db.ref('cardapio_supreme').child(id).remove();
-            alert("REMOVIDO DA REDE!");
+            alert("REMOVIDO!");
         }
     </script>
 </body>
