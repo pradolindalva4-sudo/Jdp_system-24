@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>JDP SUPREME - INDUSTRIAL KERNEL</title>
+    <title>JDP SUPREME - CONFIRMAÇÃO INDUSTRIAL</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -22,7 +21,6 @@
 
         body { background: var(--jdp-bg); color: #fff; font-family: 'Inter', sans-serif; margin: 0; padding: 90px 15px 120px 15px; overflow-x: hidden; }
 
-        /* HEADER SUPREME */
         .header-supreme {
             position: fixed; top: 0; left: 0; right: 0; height: 75px;
             background: var(--jdp-glass); backdrop-filter: blur(15px);
@@ -30,61 +28,59 @@
             display: flex; justify-content: space-between; align-items: center; padding: 0 20px;
         }
 
-        /* ZONA FANTASMA (BOTÃO INVISÍVEL) */
-        .ghost-trigger {
-            position: absolute; top: 0; left: 0; width: 80px; height: 75px;
-            z-index: 1001; cursor: default; background: transparent;
-        }
+        .ghost-trigger { position: absolute; top: 0; left: 0; width: 80px; height: 75px; z-index: 1001; cursor: default; }
 
         .stats-val { font-size: 22px; font-weight: 900; text-shadow: 0 0 10px var(--jdp-gold); }
         .stats-label { font-size: 9px; color: var(--jdp-gold); letter-spacing: 2px; text-transform: uppercase; }
 
-        /* GRID DE VENDAS */
         .grid-vendas { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
         .card-venda {
             background: var(--jdp-glass); border: 1px solid rgba(255,255,255,0.1);
             border-radius: 15px; overflow: hidden; position: relative; transition: 0.3s;
         }
-        .card-venda:active { transform: scale(0.95); }
         .card-venda img { width: 100%; height: 120px; object-fit: cover; }
         .card-info { padding: 10px; text-align: center; }
         .badge-qtd { position: absolute; top: 5px; right: 5px; background: var(--jdp-gold); color: #000; padding: 2px 8px; border-radius: 5px; font-weight: 900; font-size: 12px; }
 
-        /* MODAL E COMPROVANTE */
         #modal-supreme {
             display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98);
             z-index: 2000; padding: 20px; flex-direction: column; align-items: center; justify-content: center;
         }
+        
+        /* COMPROVANTE INDUSTRIAL */
         .comprovante-ouro {
             width: 100%; max-width: 340px; background: #0a0a0a var(--carbon);
             border: 2px solid var(--jdp-gold); padding: 25px; position: relative;
+            box-shadow: 0 0 30px rgba(245, 158, 11, 0.2);
         }
         .comp-header { text-align: center; border-bottom: 1px solid var(--jdp-gold); margin-bottom: 15px; padding-bottom: 10px; }
-        .comp-header h2 { background: var(--jdp-gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; font-size: 22px; font-weight: 900; }
+        .comp-header h2 { background: var(--jdp-gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; font-size: 24px; font-weight: 900; }
+        
+        .status-badge { background: var(--jdp-gold); color: #000; font-size: 10px; font-weight: 900; padding: 3px 10px; border-radius: 50px; display: inline-block; margin-top: 5px; }
 
-        .item-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .item-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .total-row { margin-top: 15px; padding: 10px; border: 1px solid var(--jdp-gold); background: rgba(245, 158, 11, 0.05); display: flex; justify-content: space-between; font-weight: 900; font-size: 20px; color: var(--jdp-gold); }
 
+        .msg-aceito { font-size: 11px; color: #fff; text-align: center; margin: 15px 0; line-height: 1.4; font-weight: 600; text-transform: uppercase; border: 1px dashed var(--jdp-gold); padding: 10px; }
+
         .comp-footer-industrial {
-            margin-top: 25px; display: flex; justify-content: space-between; align-items: center;
-            min-height: 70px; border-top: 1px solid rgba(245, 158, 11, 0.3); padding-top: 15px;
+            margin-top: 20px; display: flex; justify-content: space-between; align-items: center;
+            border-top: 1px solid rgba(245, 158, 11, 0.3); padding-top: 15px;
         }
-        .evangelico-zone { flex: 1; font-size: 9px; color: #bf953f; font-weight: 700; text-transform: uppercase; padding-right: 10px; }
-        .motor-img-zone { width: 70px; height: 70px; border: 1px solid var(--jdp-gold); background: #000; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .evangelico-zone { flex: 1; font-size: 10px; color: #bf953f; font-weight: 800; text-transform: uppercase; padding-right: 10px; }
+        .motor-img-zone { width: 80px; height: 80px; border: 1px solid var(--jdp-gold); background: #000; overflow: hidden; }
         .motor-img-zone img { width: 100%; height: 100%; object-fit: contain; }
 
-        /* ADMIN PANEL */
+        .btn-finalizar { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 85%; background: var(--jdp-gold-gradient); color: #000; padding: 20px; border-radius: 12px; font-weight: 900; border: none; z-index: 1100; }
+        .btn-confirmar-envio { width: 100%; max-width: 340px; margin-top: 15px; padding: 18px; background: #25D366; color: #fff; border: none; border-radius: 8px; font-weight: 900; }
+
         #painel-admin { display: none; position: fixed; inset: 0; background: #000; z-index: 5000; padding: 20px; overflow-y: auto; }
         .quadro-admin { background: #0a0a0a; border: 1px solid #333; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
-        .admin-input { width: 100%; padding: 12px; margin-bottom: 10px; background: #111; border: 1px solid #444; color: #fff; box-sizing: border-box; border-radius: 5px; }
-        
-        .btn-finalizar { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 85%; background: var(--jdp-gold-gradient); color: #000; padding: 20px; border-radius: 12px; font-weight: 900; border: none; z-index: 1100; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-        .btn-confirmar-envio { width: 100%; max-width: 340px; margin-top: 15px; padding: 18px; background: #25D366; color: #fff; border: none; border-radius: 8px; font-weight: 900; }
+        .admin-input { width: 100%; padding: 12px; margin-bottom: 10px; background: #111; border: 1px solid #444; color: #fff; border-radius: 5px; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
-    <!-- HEADER COM GHOST TRIGGER (CLIQUE NO CANTO SUPERIOR ESQUERDO PARA ADMIN) -->
     <div class="header-supreme">
         <div class="ghost-trigger" onclick="abrirAdmin()"></div>
         <div>
@@ -99,22 +95,30 @@
 
     <div class="grid-vendas" id="vitrine"></div>
 
-    <button class="btn-finalizar" onclick="gerarComprovanteOuro()">
-        <i class="fas fa-receipt"></i> FINALIZAR PEDIDO
+    <button class="btn-finalizar" onclick="gerarConfirmacao()">
+        <i class="fas fa-check-circle"></i> CONFIRMAR PEDIDO
     </button>
 
-    <!-- MODAL DE COMPROVANTE -->
     <div id="modal-supreme">
         <div class="comprovante-ouro" id="print-area">
             <div class="comp-header">
                 <h2>DONY BURGUERS</h2>
-                <div style="font-size: 8px; color: var(--jdp-gold); letter-spacing: 2px;">AUTENTICIDADE JDP INDUSTRIAL</div>
+                <div class="status-badge">PEDIDO ACEITO</div>
             </div>
+
             <div id="comp-itens-list"></div>
+
             <div class="total-row">
                 <span>TOTAL</span>
                 <span id="comp-total"></span>
             </div>
+
+            <div class="msg-aceito">
+                Seu pedido foi aceito! Aguarde atentamente que seu pedido irá chegar. <br>
+                <strong>Dony Burguer</strong> - Desde 2017 oferecendo o melhor hambúrguer e o melhor cão. <br>
+                Nosso prazer é servir bem você, amigo cliente!
+            </div>
+
             <div class="comp-footer-industrial">
                 <div class="evangelico-zone" id="txt-evangelico"></div>
                 <div class="motor-img-zone">
@@ -124,15 +128,14 @@
             <div style="text-align: center; font-size: 7px; color: #444; margin-top: 10px;" id="data-recibo"></div>
         </div>
 
-        <button class="btn-confirmar-envio" id="btn-envio-final" onclick="executarAcaoDual()">
-            <i class="fab fa-whatsapp"></i> CONFIRMAR E ENVIAR
+        <button class="btn-confirmar-envio" id="btn-envio-final" onclick="processarSaidaIndustrial()">
+            <i class="fab fa-whatsapp"></i> ENVIAR PARA O WHATSAPP
         </button>
-        <button onclick="fecharModal()" style="background:none; color:#555; border:none; margin-top:10px;">VOLTAR</button>
+        <button onclick="fecharModal()" style="background:none; color:#555; border:none; margin-top:10px;">CANCELAR</button>
     </div>
 
-    <!-- PAINEL ADMIN -->
     <div id="painel-admin">
-        <h1 style="color:var(--jdp-gold); font-size: 18px; text-align: center;">KERNEL ADMIN - JDP INDUSTRIAL</h1>
+        <h1 style="color:var(--jdp-gold); font-size: 18px; text-align: center;">KERNEL ADMIN - JDP</h1>
         <div class="quadro-admin">
             <h3 style="color:var(--jdp-gold); margin-top:0;">⚙️ MOTOR DO COMPROVANTE</h3>
             <input type="text" id="adm-motor-link" class="admin-input" placeholder="Link da Imagem do Motor">
@@ -143,9 +146,9 @@
             <input type="text" id="adm-nome" class="admin-input" placeholder="Nome do Produto">
             <input type="number" id="adm-preco" class="admin-input" placeholder="Preço">
             <input type="text" id="adm-link" class="admin-input" placeholder="Link da Foto">
-            <button onclick="salvarProduto()" style="width:100%; padding:12px; background:var(--jdp-gold); border:none; font-weight:900; border-radius:5px;">ADICIONAR AO CARDÁPIO</button>
+            <button onclick="salvarProduto()" style="width:100%; padding:12px; background:var(--jdp-gold); border:none; font-weight:900; border-radius:5px;">ADICIONAR</button>
         </div>
-        <button onclick="fecharAdmin()" style="width:100%; padding:15px; background:#222; color:#fff; border:none; border-radius:5px;">SAIR DO KERNEL</button>
+        <button onclick="fecharAdmin()" style="width:100%; padding:15px; background:#222; color:#fff; border:none; border-radius:5px;">SAIR</button>
         <div id="lista-admin" style="margin-top:20px"></div>
     </div>
 
@@ -176,8 +179,7 @@
 
             db.ref('config_motor_recibo').on('value', snap => {
                 const link = snap.val() || "";
-                const img = document.getElementById('img-motor-comprovante');
-                img.src = link;
+                document.getElementById('img-motor-comprovante').src = link;
                 document.getElementById('adm-motor-link').value = link;
             });
         };
@@ -212,10 +214,10 @@
             renderizar();
         }
 
-        function gerarComprovanteOuro() {
+        function gerarConfirmacao() {
             if (carrinho.length === 0) return alert("CARRINHO VAZIO");
             document.getElementById('txt-evangelico').innerText = frases[Math.floor(Math.random() * frases.length)];
-            document.getElementById('data-recibo').innerText = new Date().toLocaleString();
+            document.getElementById('data-recibo').innerText = "AUTENTICADO EM: " + new Date().toLocaleString();
             const list = document.getElementById('comp-itens-list');
             let total = 0;
             list.innerHTML = carrinho.map(i => {
@@ -226,84 +228,64 @@
             document.getElementById('modal-supreme').style.display = 'flex';
         }
 
-        async function executarAcaoDual() {
+        async function processarSaidaIndustrial() {
             const btn = document.getElementById('btn-envio-final');
-            btn.innerHTML = "GERANDO RECIBO...";
+            btn.innerHTML = "BAIXANDO SELO VIP...";
             btn.disabled = true;
 
             const alvo = document.getElementById('print-area');
             
             try {
-                const canvas = await html2canvas(alvo, {
-                    backgroundColor: "#000",
-                    scale: 2,
-                    useCORS: true,
-                    allowTaint: true
-                });
-
-                const imgData = canvas.toDataURL("image/png");
+                const canvas = await html2canvas(alvo, { backgroundColor: "#000", scale: 2, useCORS: true });
+                
+                // DOWNLOAD DO COMPROVANTE
                 const link = document.createElement('a');
-                link.href = imgData;
-                link.download = `JDP-RECIBO-${Date.now()}.png`;
+                link.href = canvas.toDataURL("image/png");
+                link.download = `CONFIRMACAO_DONY_${Date.now()}.png`;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
 
-                let msg = `*🔥 NOVO PEDIDO JDP*\n`;
-                carrinho.forEach(i => { msg += `• ${i.qtd}x ${i.nome}\n`; });
-                msg += `*TOTAL: R$ ${document.getElementById('comp-total').innerText}*`;
-                window.open(`https://wa.me/5592984846058?text=${encodeURIComponent(msg)}`);
+                // REDIRECIONAMENTO WHATSAPP
+                let msg = `*🔥 PEDIDO CONFIRMADO - DONY BURGUERS*\n\n`;
+                carrinho.forEach(i => { msg += `✅ ${i.qtd}x ${i.nome}\n`; });
+                msg += `\n*TOTAL: R$ ${document.getElementById('comp-total').innerText}*`;
+                msg += `\n\n_O selo de confirmação foi salvo na sua galeria. Por favor, envie-o aqui no chat._`;
+
+                setTimeout(() => {
+                    window.location.href = `https://wa.me/5592984846058?text=${encodeURIComponent(msg)}`;
+                }, 800);
 
                 carrinho = [];
                 renderizar();
                 fecharModal();
             } catch (err) {
-                alert("Erro ao processar. Verifique a conexão.");
+                alert("ERRO NO MOTOR.");
             } finally {
-                btn.innerHTML = `<i class="fab fa-whatsapp"></i> CONFIRMAR E ENVIAR`;
+                btn.innerHTML = `<i class="fab fa-whatsapp"></i> ENVIAR PARA O WHATSAPP`;
                 btn.disabled = false;
             }
         }
 
         function fecharModal() { document.getElementById('modal-supreme').style.display = 'none'; }
-        
-        function abrirAdmin() { 
-            if(prompt("ACESSO RESTRITO JDP INDUSTRIAL. SENHA:") === "drkling2025") { 
-                document.getElementById('painel-admin').style.display = 'block'; 
-                listarAdmin(); 
-            } 
-        }
-        
+        function abrirAdmin() { if(prompt("SENHA KERNEL:") === "drkling2025") { document.getElementById('painel-admin').style.display = 'block'; listarAdmin(); } }
         function fecharAdmin() { document.getElementById('painel-admin').style.display = 'none'; }
-
-        function salvarMotor() {
-            const link = document.getElementById('adm-motor-link').value;
-            db.ref('config_motor_recibo').set(link).then(() => alert("MOTOR ATUALIZADO!"));
-        }
-
+        function salvarMotor() { const link = document.getElementById('adm-motor-link').value; db.ref('config_motor_recibo').set(link).then(() => alert("MOTOR OK!")); }
         function salvarProduto() {
             const nome = document.getElementById('adm-nome').value.toUpperCase();
             const preco = parseFloat(document.getElementById('adm-preco').value);
             const link = document.getElementById('adm-link').value;
-            if(nome && preco) {
-                db.ref('cardapio_supreme').push({ nome, preco, link });
-                alert("PRODUTO ADICIONADO!");
-                document.getElementById('adm-nome').value = '';
-                document.getElementById('adm-preco').value = '';
-                document.getElementById('adm-link').value = '';
-            }
+            if(nome && preco) { db.ref('cardapio_supreme').push({ nome, preco, link }); alert("OK!"); }
         }
-
         function listarAdmin() {
             document.getElementById('lista-admin').innerHTML = produtosGlobais.map(p => `
-                <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #222; font-size:12px; align-items:center;">
+                <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #222; font-size:12px;">
                     <span>${p.nome}</span>
-                    <button onclick="remover('${p.id}')" style="background:red; color:white; border:none; padding:8px; border-radius:4px;">EXCLUIR</button>
+                    <button onclick="remover('${p.id}')" style="background:red; color:white; border:none; padding:5px;">X</button>
                 </div>
             `).join('');
         }
-
-        function remover(id) { if(confirm("Excluir item permanentemente?")) db.ref('cardapio_supreme').child(id).remove(); }
+        function remover(id) { if(confirm("Excluir?")) db.ref('cardapio_supreme').child(id).remove(); }
     </script>
 </body>
 </html>
