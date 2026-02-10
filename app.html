@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JDP SUPREME - DONY BURGUERS</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        :root {
+            --jdp-gold: #f59e0b;
+            --jdp-gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+            --jdp-bg: #020305;
+            --jdp-glass: rgba(20, 22, 28, 0.95);
+            --carbon: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+        }
+
+        body { 
+            background: var(--jdp-bg); 
+            color: #fff; 
+            font-family: 'Inter', sans-serif; 
+            margin: 0; 
+            padding: 90px 15px 120px 15px; 
+            overflow-x: hidden; 
+        }
+
+        /* NOME DO ESTABELECIMENTO EM OURO */
+        .nome-ouro-header {
+            background: var(--jdp-gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 900;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.3));
+        }
+
+        /* BOTÃO X SOLICITADO: QUASE TRANSPARENTE E VERMELHO */
+        .btn-reset-cliente {
+            position: fixed;
+            top: 80px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: rgba(255, 0, 0, 0.25);
+            font-size: 35px;
+            font-weight: bold;
+            z-index: 1500;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .btn-reset-cliente:active { color: rgba(255, 0, 0, 1); }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: -150%; width: 80%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(252, 246, 186, 0.2), transparent);
+            transform: skewX(-35deg);
+            z-index: 1;
+            pointer-events: none;
+            animation: sweep 3s infinite linear;
+        }
+        @keyframes sweep { 0% { left: -150%; } 100% { left: 150%; } }
+
+        #surprise-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .resplendor-ouro {
+            font-size: 45px;
+            font-weight: 900;
+            text-align: center;
+            text-transform: uppercase;
+            background: linear-gradient(to right, #bf953f 20%, #fcf6ba 40%, #ffffff 50%, #fcf6ba 60%, #bf953f 80%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine-gold 1.5s linear infinite;
+            filter: drop-shadow(0 0 20px rgba(245, 158, 11, 0.8));
+            opacity: 0;
+            transform: scale(0.7);
+            transition: 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes shine-gold { to { background-position: 200% center; } }
+
+        .comprovante-ouro {
+            width: 100%; max-width: 340px; background: #0a0a0a var(--carbon);
+            border: 2px solid var(--jdp-gold); padding: 25px;
+            box-shadow: 0 0 30px rgba(245, 158, 11, 0.4);
+        }
+
+        .gold-text {
+            background: var(--jdp-gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 900;
+        }
+
+        .header-supreme {
+            position: fixed; top: 0; left: 0; right: 0; height: 75px;
+            background: var(--jdp-glass); backdrop-filter: blur(15px);
+            border-bottom: 2px solid var(--jdp-gold); z-index: 1000;
+            display: flex; justify-content: space-between; align-items: center; padding: 0 20px;
+        }
+
+        .grid-vendas { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; position: relative; z-index: 2; }
+        .card-venda {
+            background: var(--jdp-glass); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 15px; overflow: hidden; position: relative;
+        }
+        .card-venda img { width: 100%; height: 120px; object-fit: cover; }
+        .badge-qtd { position: absolute; top: 5px; right: 5px; background: var(--jdp-gold); color: #000; padding: 2px 8px; border-radius: 5px; font-weight: 900; }
+
+        .btn-finalizar { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 85%; background: var(--jdp-gold-gradient); color: #000; padding: 20px; border-radius: 12px; font-weight: 900; border: none; z-index: 1100; }
+        .btn-confirmar-envio { width: 100%; max-width: 340px; margin-top: 15px; padding: 18px; background: #25D366; color: #fff; border: none; border-radius: 8px; font-weight: 900; }
+
+        #modal-supreme { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 2000; padding: 20px; flex-direction: column; align-items: center; justify-content: center; }
+        
+        #painel-admin { display: none; position: fixed; inset: 0; background: #000; z-index: 5000; padding: 20px; overflow-y: auto; }
+        .quadro-admin { background: #0a0a0a; border: 1px solid #333; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
+        .admin-input { width: 100%; padding: 12px; margin-bottom: 10px; background: #111; border: 1px solid #444; color: #fff; border-radius: 5px; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+
+    <button class="btn-reset-cliente" onclick="limparErroCliente()">&times;</button>
+
+    <div id="surprise-overlay">
+        <div id="surprise-text" class="resplendor-ouro">DONY-BURGUERS</div>
+    </div>
+
+    <div class="header-supreme">
+        <div style="width:100px; display: flex; align-items: center;">
+            <span class="nome-ouro-header">DONY BURGUERS</span>
+        </div> 
+        <div style="text-align: center;">
+            <div style="font-size:9px; color:var(--jdp-gold);">ITENS</div>
+            <div id="mini-qtd" style="font-size:22px; font-weight:900;">00</div>
+        </div>
+        <div style="text-align: right; width:100px;">
+            <div style="font-size:9px; color:var(--jdp-gold);">TOTAL</div>
+            <div id="mini-total" style="font-size:22px; font-weight:900; color:var(--jdp-gold);">R$ 0,00</div>
+        </div>
+    </div>
+
+    <div class="grid-vendas" id="vitrine"></div>
+
+    <button class="btn-finalizar" onclick="gerarConfirmacao()">
+        <i class="fas fa-check-circle"></i> CONFIRMAR PEDIDO
+    </button>
+
+    <div id="modal-supreme">
+        <div class="comprovante-ouro" id="print-area">
+            <h2 class="gold-text" style="text-align:center; margin:0; font-size:26px;">DONY BURGUERS</h2>
+            <div id="comp-itens-list" style="margin-top:15px; color:#fff;"></div>
+            <div style="margin-top:15px; padding:10px; border:1px solid var(--jdp-gold); display:flex; justify-content:space-between;">
+                <span class="gold-text">TOTAL</span>
+                <span id="comp-total" class="gold-text"></span>
+            </div>
+            <div style="margin-top:15px; text-align:center; border:1px dashed var(--jdp-gold); padding:10px;">
+                <span class="gold-text" style="font-size:11px;">Dony Burguer - Desde 2017 oferecendo o melhor hambúrguer e o melhor Kikão.</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px;">
+                <div id="txt-evangelico" style="font-size:10px; color:#bf953f; font-weight:800;"></div>
+                <img id="img-motor-comprovante" src="" style="width:70px; height:70px; object-fit:contain;">
+            </div>
+        </div>
+        <button class="btn-confirmar-envio" id="btn-envio-final" onclick="ativarProtocoloOuro()">
+            <i class="fab fa-whatsapp"></i> ENVIAR PARA O WHATSAPP
+        </button>
+        <button onclick="fecharModal()" style="background:none; color:#555; border:none; margin-top:10px;">CANCELAR</button>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCEdXF7ScnMYz0Ce0OW-B_UJ8Bm5Pl9m8o",
+            authDomain: "dony-burguers.firebaseapp.com",
+            databaseURL: "https://dony-burguers-default-rtdb.firebaseio.com",
+            projectId: "dony-burguers",
+            storageBucket: "dony-burguers.firebasestorage.app",
+            messagingSenderId: "511509845142",
+            appId: "1:511509845142:web:9b0254a09ad8051e039eb7"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let carrinho = [];
+        let produtosGlobais = [];
+        let audioSurpresaUrl = "";
+        const frases = ["O SENHOR É MEU PASTOR.", "TUDO POSSO EM DEUS.", "DEUS É FIEL."];
+
+        window.onload = () => {
+            db.ref('cardapio_supreme').on('value', snap => {
+                const data = snap.val();
+                produtosGlobais = data ? Object.entries(data).map(([id, val]) => ({id, ...val})) : [];
+                renderizar();
+            });
+            db.ref('config_motor_recibo').on('value', snap => { document.getElementById('img-motor-comprovante').src = snap.val() || ""; });
+            db.ref('config_audio_surpresa').on('value', snap => { audioSurpresaUrl = snap.val() || ""; });
+        };
+
+        function renderizar() {
+            const vitrine = document.getElementById('vitrine');
+            let total = 0, itens = 0;
+            carrinho.forEach(c => { total += (c.preco * c.qtd); itens += c.qtd; });
+            document.getElementById('mini-total').innerText = `R$ ${total.toFixed(2)}`;
+            document.getElementById('mini-qtd').innerText = itens.toString().padStart(2, '0');
+
+            vitrine.innerHTML = produtosGlobais.map((p, i) => {
+                const item = carrinho.find(c => c.nome === p.nome);
+                const qtd = item ? item.qtd : 0;
+                return `
+                    <div class="card-venda" onclick="addCarrinho(${i})">
+                        ${qtd > 0 ? `<div class="badge-qtd">${qtd}</div>` : ''}
+                        <img src="${p.link}">
+                        <div style="padding:10px; text-align:center;">
+                            <div style="font-size:11px; color:#888">${p.nome}</div>
+                            <div style="font-weight:900">R$ ${parseFloat(p.preco).toFixed(2)}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function addCarrinho(i) {
+            const p = produtosGlobais[i];
+            const item = carrinho.find(c => c.nome === p.nome);
+            if (item) item.qtd++; else carrinho.push({ ...p, qtd: 1 });
+            renderizar();
+        }
+
+        function limparErroCliente() {
+            if(confirm("")) {
+                carrinho = [];
+                renderizar();
+            }
+        }
+
+        function gerarConfirmacao() {
+            if (carrinho.length === 0) return alert("CARRINHO VAZIO");
+            document.getElementById('txt-evangelico').innerText = frases[Math.floor(Math.random() * frases.length)];
+            const list = document.getElementById('comp-itens-list');
+            let total = 0;
+            list.innerHTML = carrinho.map(i => {
+                total += (i.qtd * i.preco);
+                return `<div style="display:flex; justify-content:space-between; font-size:13px; margin-top:5px; border-bottom:1px solid #222;"><span>${i.qtd}x ${i.nome}</span><span>R$ ${(i.qtd*i.preco).toFixed(2)}</span></div>`;
+            }).join('');
+            document.getElementById('comp-total').innerText = `R$ ${total.toFixed(2)}`;
+            document.getElementById('modal-supreme').style.display = 'flex';
+        }
+
+        async function ativarProtocoloOuro() {
+            const overlay = document.getElementById('surprise-overlay');
+            const text = document.getElementById('surprise-text');
+            overlay.style.display = 'flex';
+            if (navigator.vibrate) navigator.vibrate([400, 100, 400, 100, 400, 100, 400]);
+            if (audioSurpresaUrl) { const audio = new Audio(audioSurpresaUrl); audio.play(); }
+            setTimeout(() => { text.style.opacity = '1'; text.style.transform = 'scale(1)'; }, 300);
+            setTimeout(() => { overlay.style.display = 'none'; processarSaidaIndustrial(); }, 4500);
+        }
+
+        async function processarSaidaIndustrial() {
+            const alvo = document.getElementById('print-area');
+            try {
+                const canvas = await html2canvas(alvo, { backgroundColor: "#000", scale: 2, useCORS: true });
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL("image/png");
+                link.download = `DONY_GOLD_${Date.now()}.png`;
+                link.click();
+                let msg = `*🔥 PEDIDO CONFIRMADO - DONY BURGUERS*\n\n`;
+                carrinho.forEach(i => { msg += `✅ ${i.qtd}x ${i.nome}\n`; });
+                msg += `\n*TOTAL: R$ ${document.getElementById('comp-total').innerText}*`;
+                window.location.href = `https://wa.me/5592984846058?text=${encodeURIComponent(msg)}`;
+                carrinho = []; renderizar(); fecharModal();
+            } catch (err) { alert("ERRO NO MOTOR."); }
+        }
+
+        function fecharModal() { document.getElementById('modal-supreme').style.display = 'none'; }
+    // Forçar modo Fullscreen para parecer App Nativo
+        document.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            }
+        }, {once: true});
+    </script>
+</body>
+</html>
+
