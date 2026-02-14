@@ -2,302 +2,224 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>JDP SUPREME - DONY BURGUERS</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="./manifest.json">
+
+    <meta name="theme-color" content="#00ff88">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DonyBurguer's">
+    <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192x192.png">
+    <link rel="apple-touch-icon" href="./icons/icon-192x192.png">
+    <title>DONY BURGUERS SUPREME - JDP INDUSTRIAL</title>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    
     <style>
-        :root {
-            --jdp-gold: #f59e0b;
-            --jdp-gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
-            --jdp-bg: #020305;
-            --jdp-glass: rgba(20, 22, 28, 0.95);
-            --carbon: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+        :root { 
+            --gold-18k: linear-gradient(145deg, #bf953f 0%, #fcf6ba 20%, #b38728 40%, #fcf6ba 60%, #aa771c 80%, #fcf6ba 100%);
+            --gold-solid: #d4af37;
+            --dark: #000;
+            --shine-effect: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
         }
-
-        body { 
-            background: var(--jdp-bg); 
-            color: #fff; 
-            font-family: 'Inter', sans-serif; 
-            margin: 0; 
-            padding: 90px 15px 120px 15px; 
-            overflow-x: hidden; 
-        }
-
-        /* NOME DO ESTABELECIMENTO EM OURO */
-        .nome-ouro-header {
-            background: var(--jdp-gold-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 900;
-            font-size: 14px;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.3));
-        }
-
-        /* BOTÃO X SOLICITADO: QUASE TRANSPARENTE E VERMELHO */
-        .btn-reset-cliente {
-            position: fixed;
-            top: 80px;
-            right: 15px;
-            background: none;
-            border: none;
-            color: rgba(255, 0, 0, 0.25);
-            font-size: 35px;
-            font-weight: bold;
-            z-index: 1500;
-            cursor: pointer;
-            line-height: 1;
-        }
-        .btn-reset-cliente:active { color: rgba(255, 0, 0, 1); }
-
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0; left: -150%; width: 80%; height: 100%;
-            background: linear-gradient(to right, transparent, rgba(252, 246, 186, 0.2), transparent);
-            transform: skewX(-35deg);
-            z-index: 1;
-            pointer-events: none;
-            animation: sweep 3s infinite linear;
-        }
-        @keyframes sweep { 0% { left: -150%; } 100% { left: 150%; } }
-
-        #surprise-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: #000;
-            z-index: 9999;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .resplendor-ouro {
-            font-size: 45px;
-            font-weight: 900;
-            text-align: center;
-            text-transform: uppercase;
-            background: linear-gradient(to right, #bf953f 20%, #fcf6ba 40%, #ffffff 50%, #fcf6ba 60%, #bf953f 80%);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: shine-gold 1.5s linear infinite;
-            filter: drop-shadow(0 0 20px rgba(245, 158, 11, 0.8));
-            opacity: 0;
-            transform: scale(0.7);
-            transition: 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        @keyframes shine-gold { to { background-position: 200% center; } }
-
-        .comprovante-ouro {
-            width: 100%; max-width: 340px; background: #0a0a0a var(--carbon);
-            border: 2px solid var(--jdp-gold); padding: 25px;
-            box-shadow: 0 0 30px rgba(245, 158, 11, 0.4);
-        }
-
-        .gold-text {
-            background: var(--jdp-gold-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 900;
-        }
-
-        .header-supreme {
-            position: fixed; top: 0; left: 0; right: 0; height: 75px;
-            background: var(--jdp-glass); backdrop-filter: blur(15px);
-            border-bottom: 2px solid var(--jdp-gold); z-index: 1000;
-            display: flex; justify-content: space-between; align-items: center; padding: 0 20px;
-        }
-
-        .grid-vendas { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; position: relative; z-index: 2; }
-        .card-venda {
-            background: var(--jdp-glass); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 15px; overflow: hidden; position: relative;
-        }
-        .card-venda img { width: 100%; height: 120px; object-fit: cover; }
-        .badge-qtd { position: absolute; top: 5px; right: 5px; background: var(--jdp-gold); color: #000; padding: 2px 8px; border-radius: 5px; font-weight: 900; }
-
-        .btn-finalizar { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 85%; background: var(--jdp-gold-gradient); color: #000; padding: 20px; border-radius: 12px; font-weight: 900; border: none; z-index: 1100; }
-        .btn-confirmar-envio { width: 100%; max-width: 340px; margin-top: 15px; padding: 18px; background: #25D366; color: #fff; border: none; border-radius: 8px; font-weight: 900; }
-
-        #modal-supreme { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 2000; padding: 20px; flex-direction: column; align-items: center; justify-content: center; }
+        body { background: var(--dark); color: var(--gold-solid); font-family: 'Arial Black', sans-serif; margin: 0; padding: 110px 3% 120px 3%; overflow-x: hidden; user-select: none; -webkit-user-select: none; }
         
-        #painel-admin { display: none; position: fixed; inset: 0; background: #000; z-index: 5000; padding: 20px; overflow-y: auto; }
-        .quadro-admin { background: #0a0a0a; border: 1px solid #333; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
-        .admin-input { width: 100%; padding: 12px; margin-bottom: 10px; background: #111; border: 1px solid #444; color: #fff; border-radius: 5px; box-sizing: border-box; }
+        /* HEADER INDUSTRIAL JDP */
+        .header { position: fixed; top: 0; left: 0; right: 0; height: 95px; background: #000; border-bottom: 3px solid var(--gold-solid); z-index: 1000; display: flex; justify-content: space-between; align-items: center; padding: 0 5%; }
+        .jdp-signature { font-size: 9px; color: var(--gold-solid); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        #secret-trigger { font-size: 22px; font-weight: 900; background: var(--gold-18k); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        #total-display { font-size: 26px; font-weight: 900; background: var(--gold-18k); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .btn-google { background: var(--gold-18k); color: #000; border: none; padding: 6px 12px; border-radius: 5px; font-size: 11px; font-weight: bold; cursor: pointer; margin-right: 10px; box-shadow: 0 0 10px var(--gold-solid); }
+        .btn-x-discreto { background: rgba(255, 0, 0, 0.1); color: rgba(255, 255, 255, 0.3); border: 1px solid rgba(255, 255, 255, 0.1); padding: 4px 10px; border-radius: 4px; font-size: 14px; cursor: pointer; margin-left: 10px; }
+
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .card { background: #050505; border: 1px solid #1a1a1a; border-radius: 10px; overflow: hidden; position: relative; height: 240px; }
+        .card img { width: 100%; height: 100%; object-fit: cover; }
+        .card-info { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.95), transparent); padding: 12px 5px; text-align: center; z-index: 2; }
+        .card-info h4 { margin: 0; font-size: 0.8rem; text-transform: uppercase; color: #fff; letter-spacing: 1px; }
+        .card-info .price { font-weight: 900; font-size: 1.2rem; background: var(--gold-18k); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .btn-confirmar { position: fixed; bottom: 25px; left: 5%; width: 90%; background: var(--gold-18k); color: #000; padding: 20px; border: none; border-radius: 12px; font-weight: 900; font-size: 1.7rem; z-index: 1100; box-shadow: 0 0 30px rgba(184, 134, 11, 0.5); }
+        
+        /* MODAL PAGAMENTO OURO */
+        #modal-qrcode { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 20000; flex-direction: column; align-items: center; justify-content: center; border: 5px solid var(--gold-solid); }
+        #modal-qrcode h2 { background: var(--gold-18k); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2rem; margin-bottom: 20px; text-align: center; }
+        #qr-img { width: 80%; max-width: 350px; border: 8px solid #fff; border-radius: 15px; }
+        #timer-display { margin-top: 20px; font-size: 1.5rem; color: var(--gold-solid); font-weight: bold; }
+
+        /* ESCRITÓRIO JDP */
+        #escritorio-jdp { display: none; position: fixed; inset: 0; background: #000; z-index: 10000; padding: 20px; flex-direction: column; overflow-y: auto; border: 4px solid var(--gold-solid); }
+        .section { border: 1px solid var(--gold-solid); padding: 15px; margin-bottom: 20px; border-radius: 8px; }
+        input { width: 94%; background: #111; border: 1px solid #333; color: #fff; padding: 12px; margin: 5px 0; border-radius: 5px; }
+        .btn-jdp { background: var(--gold-18k); color: #000; border: none; padding: 15px; width: 100%; font-weight: 900; border-radius: 5px; margin-top: 10px; }
+        .item-gestao { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #222; gap: 10px; }
+        .btn-del { background: #ff0000; color: #fff; border: none; padding: 8px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        
+        #supreme-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 9999; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
+        .gold-title { font-size: 12vw; font-weight: 900; white-space: nowrap; background: var(--gold-18k); -webkit-background-clip: text; -webkit-text-fill-color: transparent; position: absolute; transform: translateX(-150%); }
+        .slide-active { animation: slidePass 1s ease-in-out 3; }
+        @keyframes slidePass { 0% { transform: translateX(-150%); } 50% { transform: translateX(0%); } 100% { transform: translateX(150%); } }
+        #flash-container { display: none; width: 100%; height: 100%; align-items: center; justify-content: center; }
+        #flash-img { max-width: 85%; border: 6px solid var(--gold-solid); }
+        #final-resplendent { display: none; font-size: 13vw; font-weight: 900; text-align: center; background: var(--gold-18k); -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: pulseGold 2s infinite alternate; }
+        @keyframes pulseGold { from { transform: scale(0.9); opacity: 0.8; } to { transform: scale(1.1); opacity: 1; } }
     </style>
 </head>
 <body>
-
-    <button class="btn-reset-cliente" onclick="limparErroCliente()">&times;</button>
-
-    <div id="surprise-overlay">
-        <div id="surprise-text" class="resplendor-ouro">DONY-BURGUERS</div>
-    </div>
-
-    <div class="header-supreme">
-        <div style="width:100px; display: flex; align-items: center;">
-            <span class="nome-ouro-header">DONY BURGUERS</span>
-        </div> 
-        <div style="text-align: center;">
-            <div style="font-size:9px; color:var(--jdp-gold);">ITENS</div>
-            <div id="mini-qtd" style="font-size:22px; font-weight:900;">00</div>
+    <div class="header">
+        <div>
+            <div class="jdp-signature">José Divino Prado da Lapa // Engenheiro Sênior</div>
+            <div id="secret-trigger">DONY BURGUERS</div>
         </div>
-        <div style="text-align: right; width:100px;">
-            <div style="font-size:9px; color:var(--jdp-gold);">TOTAL</div>
-            <div id="mini-total" style="font-size:22px; font-weight:900; color:var(--jdp-gold);">R$ 0,00</div>
+        <div style="display: flex; align-items: center;">
+            <button class="btn-google" onclick="abrirPagamento()">GOOGLE QR</button>
+            <div id="total-display">R$ 0,00</div>
+            <button class="btn-x-discreto" onclick="resetCarrinho()">X</button>
         </div>
     </div>
 
-    <div class="grid-vendas" id="vitrine"></div>
+    <div class="grid" id="vitrine"></div>
+    <button class="btn-confirmar" onclick="iniciarSequenciaJDP()">CONFIRMAR PEDIDO</button>
 
-    <button class="btn-finalizar" onclick="gerarConfirmacao()">
-        <i class="fas fa-check-circle"></i> CONFIRMAR PEDIDO
-    </button>
+    <div id="modal-qrcode">
+        <h2>PIX DONY BURGUER'S</h2>
+        <img id="qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=Pradolindalva4@gmail.com">
+        <div id="timer-display">FECHANDO EM: 10s</div>
+    </div>
 
-    <div id="modal-supreme">
-        <div class="comprovante-ouro" id="print-area">
-            <h2 class="gold-text" style="text-align:center; margin:0; font-size:26px;">DONY BURGUERS</h2>
-            <div id="comp-itens-list" style="margin-top:15px; color:#fff;"></div>
-            <div style="margin-top:15px; padding:10px; border:1px solid var(--jdp-gold); display:flex; justify-content:space-between;">
-                <span class="gold-text">TOTAL</span>
-                <span id="comp-total" class="gold-text"></span>
-            </div>
-            <div style="margin-top:15px; text-align:center; border:1px dashed var(--jdp-gold); padding:10px;">
-                <span class="gold-text" style="font-size:11px;">Dony Burguer - Desde 2017 oferecendo o melhor hambúrguer e o melhor Kikão.</span>
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px;">
-                <div id="txt-evangelico" style="font-size:10px; color:#bf953f; font-weight:800;"></div>
-                <img id="img-motor-comprovante" src="" style="width:70px; height:70px; object-fit:contain;">
-            </div>
+    <div id="escritorio-jdp">
+        <h1 style="text-align:center; background: var(--gold-18k); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">ESCRITÓRIO JDP</h1>
+        <div class="section">
+            <h3>CADASTRAR PRODUTO</h3>
+            <input type="text" id="inp-nome" placeholder="Nome">
+            <input type="number" id="inp-preco" placeholder="Preço">
+            <input type="text" id="inp-link" placeholder="Link Imagem">
+            <input type="number" id="inp-estoque" placeholder="Quantidade em Estoque">
+            <button class="btn-jdp" onclick="salvarProduto()">SALVAR NO SISTEMA</button>
         </div>
-        <button class="btn-confirmar-envio" id="btn-envio-final" onclick="ativarProtocoloOuro()">
-            <i class="fab fa-whatsapp"></i> ENVIAR PARA O WHATSAPP
-        </button>
-        <button onclick="fecharModal()" style="background:none; color:#555; border:none; margin-top:10px;">CANCELAR</button>
+        <div class="section"><h3>PLAYLIST MP3 (FIREBASE)</h3><div id="slots-audio"></div></div>
+        <div class="section"><h3>GESTÃO DE ESTOQUE</h3><div id="lista-gestao"></div></div>
+        <button onclick="document.getElementById('escritorio-jdp').style.display='none'" class="btn-jdp" style="background:#333; color:#fff;">SAIR DO ESCRITÓRIO</button>
+    </div>
+
+    <div id="supreme-overlay">
+        <div id="gold-anim" class="gold-title">DONY BURGUERS</div>
+        <div id="flash-container"><img id="flash-img" src=""></div>
+        <div id="final-resplendent">DONY BURGUERS</div>
     </div>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyCEdXF7ScnMYz0Ce0OW-B_UJ8Bm5Pl9m8o",
-            authDomain: "dony-burguers.firebaseapp.com",
-            databaseURL: "https://dony-burguers-default-rtdb.firebaseio.com",
-            projectId: "dony-burguers",
-            storageBucket: "dony-burguers.firebasestorage.app",
-            messagingSenderId: "511509845142",
-            appId: "1:511509845142:web:9b0254a09ad8051e039eb7"
-        };
-
+        const firebaseConfig = { apiKey: "AIzaSyCEdXF7ScnMYz0Ce0OW-B_UJ8Bm5Pl9m8o", databaseURL: "https://dony-burguers-default-rtdb.firebaseio.com" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+        let carrinho = [], produtos = [], processando = false;
 
-        let carrinho = [];
-        let produtosGlobais = [];
-        let audioSurpresaUrl = "";
-        const frases = ["O SENHOR É MEU PASTOR.", "TUDO POSSO EM DEUS.", "DEUS É FIEL."];
-
-        window.onload = () => {
-            db.ref('cardapio_supreme').on('value', snap => {
-                const data = snap.val();
-                produtosGlobais = data ? Object.entries(data).map(([id, val]) => ({id, ...val})) : [];
-                renderizar();
-            });
-            db.ref('config_motor_recibo').on('value', snap => { document.getElementById('img-motor-comprovante').src = snap.val() || ""; });
-            db.ref('config_audio_surpresa').on('value', snap => { audioSurpresaUrl = snap.val() || ""; });
-        };
-
-        function renderizar() {
-            const vitrine = document.getElementById('vitrine');
-            let total = 0, itens = 0;
-            carrinho.forEach(c => { total += (c.preco * c.qtd); itens += c.qtd; });
-            document.getElementById('mini-total').innerText = `R$ ${total.toFixed(2)}`;
-            document.getElementById('mini-qtd').innerText = itens.toString().padStart(2, '0');
-
-            vitrine.innerHTML = produtosGlobais.map((p, i) => {
-                const item = carrinho.find(c => c.nome === p.nome);
-                const qtd = item ? item.qtd : 0;
-                return `
-                    <div class="card-venda" onclick="addCarrinho(${i})">
-                        ${qtd > 0 ? `<div class="badge-qtd">${qtd}</div>` : ''}
-                        <img src="${p.link}">
-                        <div style="padding:10px; text-align:center;">
-                            <div style="font-size:11px; color:#888">${p.nome}</div>
-                            <div style="font-weight:900">R$ ${parseFloat(p.preco).toFixed(2)}</div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function addCarrinho(i) {
-            const p = produtosGlobais[i];
-            const item = carrinho.find(c => c.nome === p.nome);
-            if (item) item.qtd++; else carrinho.push({ ...p, qtd: 1 });
-            renderizar();
-        }
-
-        function limparErroCliente() {
-            if(confirm("")) {
-                carrinho = [];
-                renderizar();
+        // MOTOR DE VOZ (OUVE "QR CODE" PARA PAGAR)
+        function iniciarVoz() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                const recognition = new SpeechRecognition();
+                recognition.continuous = true;
+                recognition.lang = 'pt-BR';
+                recognition.onresult = (e) => {
+                    const comando = e.results[e.results.length - 1][0].transcript.toLowerCase();
+                    if (comando.includes("qr code") || comando.includes("pagar")) abrirPagamento();
+                };
+                recognition.onerror = () => setTimeout(() => recognition.start(), 1000);
+                recognition.onend = () => recognition.start();
+                try { recognition.start(); } catch(err) {}
             }
         }
+        document.body.addEventListener('click', () => iniciarVoz(), {once: true});
 
-        function gerarConfirmacao() {
-            if (carrinho.length === 0) return alert("CARRINHO VAZIO");
-            document.getElementById('txt-evangelico').innerText = frases[Math.floor(Math.random() * frases.length)];
-            const list = document.getElementById('comp-itens-list');
-            let total = 0;
-            list.innerHTML = carrinho.map(i => {
-                total += (i.qtd * i.preco);
-                return `<div style="display:flex; justify-content:space-between; font-size:13px; margin-top:5px; border-bottom:1px solid #222;"><span>${i.qtd}x ${i.nome}</span><span>R$ ${(i.qtd*i.preco).toFixed(2)}</span></div>`;
-            }).join('');
-            document.getElementById('comp-total').innerText = `R$ ${total.toFixed(2)}`;
-            document.getElementById('modal-supreme').style.display = 'flex';
+        function abrirPagamento() {
+            const modal = document.getElementById('modal-qrcode');
+            modal.style.display = 'flex';
+            let seg = 10;
+            const t = setInterval(() => {
+                seg--;
+                document.getElementById('timer-display').innerText = `FECHANDO EM: ${seg}s`;
+                if(seg <= 0) { clearInterval(t); modal.style.display = 'none'; document.getElementById('timer-display').innerText = "FECHANDO EM: 10s"; }
+            }, 1000);
         }
 
-        async function ativarProtocoloOuro() {
-            const overlay = document.getElementById('surprise-overlay');
-            const text = document.getElementById('surprise-text');
-            overlay.style.display = 'flex';
-            if (navigator.vibrate) navigator.vibrate([400, 100, 400, 100, 400, 100, 400]);
-            if (audioSurpresaUrl) { const audio = new Audio(audioSurpresaUrl); audio.play(); }
-            setTimeout(() => { text.style.opacity = '1'; text.style.transform = 'scale(1)'; }, 300);
-            setTimeout(() => { overlay.style.display = 'none'; processarSaidaIndustrial(); }, 4500);
+        // FUNÇÕES ORIGINAIS PRESERVADAS
+        const trigger = document.getElementById('secret-trigger');
+        let timerSecreto;
+        trigger.addEventListener('touchstart', () => {
+            timerSecreto = setTimeout(() => {
+                if(prompt("SENHA JDP:") === "1234") { document.getElementById('escritorio-jdp').style.display = 'flex'; renderEstudio(); }
+            }, 5000);
+        });
+        trigger.addEventListener('touchend', () => clearTimeout(timerSecreto));
+
+        function resetCarrinho() { carrinho = []; document.getElementById('total-display').innerText = "R$ 0,00"; }
+
+        function salvarProduto() {
+            const n = document.getElementById('inp-nome').value, p = document.getElementById('inp-preco').value, l = document.getElementById('inp-link').value, e = document.getElementById('inp-estoque').value;
+            if(n && p && l) db.ref('cardapio_supreme').push({ nome: n, preco: p, link: l, estoque: parseInt(e) || 0 });
         }
 
-        async function processarSaidaIndustrial() {
-            const alvo = document.getElementById('print-area');
-            try {
-                const canvas = await html2canvas(alvo, { backgroundColor: "#000", scale: 2, useCORS: true });
-                const link = document.createElement('a');
-                link.href = canvas.toDataURL("image/png");
-                link.download = `DONY_GOLD_${Date.now()}.png`;
-                link.click();
-                let msg = `*🔥 PEDIDO CONFIRMADO - DONY BURGUERS*\n\n`;
-                carrinho.forEach(i => { msg += `✅ ${i.qtd}x ${i.nome}\n`; });
-                msg += `\n*TOTAL: R$ ${document.getElementById('comp-total').innerText}*`;
-                window.location.href = `https://wa.me/5592984846058?text=${encodeURIComponent(msg)}`;
-                carrinho = []; renderizar(); fecharModal();
-            } catch (err) { alert("ERRO NO MOTOR."); }
-        }
-
-        function fecharModal() { document.getElementById('modal-supreme').style.display = 'none'; }
-    // Forçar modo Fullscreen para parecer App Nativo
-        document.addEventListener('click', () => {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(() => {});
+        async function renderEstudio() {
+            const snap = await db.ref('audio_supreme').get();
+            const audios = snap.val() || {};
+            const slotCont = document.getElementById('slots-audio');
+            slotCont.innerHTML = '';
+            for(let i=1; i<=5; i++) {
+                const tem = audios['slot_'+i];
+                slotCont.innerHTML += `<div class="item-gestao"><span>ÁUDIO ${i} ${tem?'💎':'⚪'}</span><input type="file" onchange="subirAudio(this, ${i})" style="width:80px">${tem?`<button onclick="ouvirAudio(${i})">▶️</button><button onclick="excluirAudio(${i})">🗑️</button>`:''}</div>`;
             }
-        }, {once: true});
+            document.getElementById('lista-gestao').innerHTML = produtos.map(p => `<div class="item-gestao"><span>${p.nome} (${p.estoque})</span><button class="btn-del" onclick="db.ref('cardapio_supreme').child('${p.id}').remove()">X</button></div>`).join('');
+        }
+
+        function subirAudio(input, i) {
+            const reader = new FileReader();
+            reader.onload = (e) => db.ref('audio_supreme/slot_' + i).set(e.target.result).then(() => renderEstudio());
+            reader.readAsDataURL(input.files[0]);
+        }
+
+        async function ouvirAudio(i) { const snap = await db.ref('audio_supreme/slot_' + i).get(); if(snap.exists()) new Audio(snap.val()).play(); }
+        function excluirAudio(i) { db.ref('audio_supreme/slot_' + i).remove().then(() => renderEstudio()); }
+
+        db.ref('cardapio_supreme').on('value', snap => {
+            const data = snap.val(); produtos = data ? Object.entries(data).map(([id, val]) => ({id, ...val})) : [];
+            document.getElementById('vitrine').innerHTML = produtos.map(p => `
+                <div class="card" onclick="add('${p.id}')">
+                    <img src="${p.link}">
+                    <div class="card-info"><h4>${p.nome}</h4><div class="price">R$ ${parseFloat(p.preco).toFixed(2)}</div></div>
+                </div>`).join('');
+        });
+
+        function add(id) {
+            const p = produtos.find(x => x.id === id);
+            if(p.estoque <= 0) return alert("Esgotado!");
+            carrinho.push(p);
+            document.getElementById('total-display').innerText = `R$ ${carrinho.reduce((acc, i) => acc + parseFloat(i.preco), 0).toFixed(2)}`;
+        }
+
+        async function iniciarSequenciaJDP() {
+            if (carrinho.length === 0 || processando) return;
+            processando = true;
+            const snapAudios = await db.ref('audio_supreme').get();
+            if(snapAudios.exists()) {
+                const lista = Object.values(snapAudios.val());
+                const snapIdx = await db.ref('rotation').get();
+                let idx = (snapIdx.val() || 0) % lista.length;
+                new Audio(lista[idx]).play();
+                db.ref('rotation').set((snapIdx.val() || 0) + 1);
+            }
+            db.ref('PEDIDOS_PRODUCAO').push({ itens: carrinho, total: document.getElementById('total-display').innerText, data: new Date().toLocaleString() });
+            for(let item of carrinho) db.ref('cardapio_supreme/' + item.id).update({ estoque: (item.estoque || 1) - 1 });
+            
+            const overlay = document.getElementById('supreme-overlay'), goldAnim = document.getElementById('gold-anim'), flashBox = document.getElementById('flash-container'), flashImg = document.getElementById('flash-img'), finalRes = document.getElementById('final-resplendent');
+            overlay.style.display = 'flex'; goldAnim.classList.add('slide-active');
+            await new Promise(r => setTimeout(r, 3000));
+            goldAnim.style.display = 'none'; flashBox.style.display = 'flex';
+            for (let p of produtos) { flashImg.src = p.link; await new Promise(r => setTimeout(r, 150)); }
+            flashBox.style.display = 'none'; finalRes.style.display = 'block';
+            await new Promise(r => setTimeout(r, 4000));
+            overlay.style.display = 'none'; finalRes.style.display = 'none'; goldAnim.classList.remove('slide-active'); goldAnim.style.display = 'block';
+            resetCarrinho(); processando = false;
+        }
     </script>
 </body>
 </html>
-
